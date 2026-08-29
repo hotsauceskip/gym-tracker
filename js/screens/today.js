@@ -109,7 +109,8 @@ const TodayScreen = {
       restBtn.className = "rest-timer-btn";
       restBtnWrap.appendChild(restBtn);
       card.appendChild(restBtnWrap);
-      new RestTimer(restBtn, exDef.restSec);
+      GlobalRestTimer.syncButton(restBtn, exDef.id, exDef.restSec);
+      restBtn.addEventListener("click", () => GlobalRestTimer.toggle(exDef.id, exDef.restSec));
 
       const setsTable = document.createElement("div");
       setsTable.className = "sets-table";
