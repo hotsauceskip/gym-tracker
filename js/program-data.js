@@ -25,7 +25,7 @@ const DAY1_CHEST_BACK_ARMS_A = {
   title: "ГРУДЬ+СПИНА+РУКИ",
   exercises: [
     ex("Жим гантелей в наклоне", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 1, restSec: 180, incrementStep: 2, note: "Концентрация на груди. Своди лопатки, отключай плечи. Полная амплитуда" }),
-    ex("Подтягивания", { warmup: { sets: 1, reps: "разминочный в блоке" }, work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 160, incrementStep: 2.5, note: "Широкий хват. Хотя бы +2.5 кг. Если не можешь — тяга блока" }),
+    ex("Вертикальная тяга блока широким хватом", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Концентрация на спине. Без читинга, медленное выполнение" }),
     ex("Жим штанги лежа", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 160, incrementStep: 2.5, note: "Концентрация на груди. Своди лопатки, отключай плечи. Полная амплитуда" }),
     ex("Тяга гантелей в наклоне", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 140, incrementStep: 2, note: "Поочередно, фиксируешь в верхней точке. Отключай бицепс при тяге" }),
     ex("Разгибания на трицепс в блоке стоя c прямой рукоятью", { work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 90, incrementStep: 1.25, note: "Четкое выполнение. Без лишних движений" }),
@@ -37,13 +37,12 @@ const DAY3_LEGS_SHOULDERS_A = {
   key: "legs-shoulders-a",
   title: "НОГИ+ПЛЕЧИ",
   exercises: [
-    ex("Приседания в Смите", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "8" }, rir: 2, restSec: 180, incrementStep: 5, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
+    ex("Жим ногами", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "8" }, rir: 2, restSec: 180, incrementStep: 10, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
     ex("Сгибания лежа в тренажере на бицепс бедра", { work: { sets: 2, reps: "12" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
     ex("Разгибания сидя в тренажере", { work: { sets: 1, reps: "12" }, rir: 3, restSec: 120, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
     ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, note: "Неполная амплитуда (только на дельту)" }),
     ex("Тяга блока к подбородку", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 2, restSec: 120, incrementStep: 2.5, note: "Поднимай не выше уровня плеч. Тяни локтями, а не кистями" }),
     ex("Махи гантелей в стороны стоя", { work: { sets: 3, reps: "12" }, rir: 0, restSec: 90, incrementStep: 1, note: "Чёткая техника. Не поднимай трапециями" }),
-    ex("Подъемы ног в висе", { work: { sets: 4, reps: "15" }, rir: 2, restSec: 60 }),
   ],
 };
 
@@ -57,7 +56,6 @@ const DAY5_CHEST_BACK_ARMS_B = {
     ex("Жим в Хаммере на верх груди", { work: { sets: 2, reps: "10" }, rir: 1, restSec: 150, incrementStep: 2.5, note: "Концентрация на верхе груди" }),
     ex("Подъем штанги на бицепс", { work: { sets: 3, pyramid: ["12", "10", "8"] }, rir: 1, restSec: 120, incrementStep: 2.5, note: "В каждом подходе повышаешь вес" }),
     ex("Разгибания с EZ-штангой из-за головы лежа в наклоне", { work: { sets: 3, pyramid: ["12", "10", "8"] }, rir: 1, restSec: 120, incrementStep: 1.25, note: "В каждом подходе повышаешь вес. Хорошая амплитуда" }),
-    ex("Молитва в блоке", { work: { sets: 3, reps: "15" }, rir: 1, restSec: 60, incrementStep: 1.25 }),
   ],
 };
 
@@ -67,11 +65,10 @@ const DAY1_LEGS_SHOULDERS_B = {
   exercises: [
     ex("Жим ногами", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 2, restSec: 170, incrementStep: 10, note: "Полная амплитуда движения. Контролируй отсутствие отказов" }),
     ex("Разгибания сидя в тренажере", { work: { sets: 2, reps: "12" }, rir: 1, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
-    ex("Мертвая тяга", { work: { sets: 1, reps: "10" }, rir: 3, restSec: 150, incrementStep: 5, note: "Соблюдай технику. Концентрация на бицепсе бедра" }),
-    ex("Тяга штанги на заднюю дельту", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 2, restSec: 120, incrementStep: 2, note: "Неполная амплитуда (только на заднюю дельту)" }),
+    ex("Сгибания лежа в тренажере на бицепс бедра", { work: { sets: 2, reps: "12" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
+    ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, note: "Неполная амплитуда (только на дельту)" }),
     ex("Отведение рук в кроссовере (средняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "10" }, rir: 0, restSec: 60, incrementStep: 1, note: "Чёткая техника. Концентрация на плечах" }),
     ex("Жим гантелей сидя", { work: { sets: 3, reps: "12" }, rir: 2, restSec: 120, incrementStep: 2, note: "Полная амплитуда" }),
-    ex("Подъемы на носки стоя", { work: { sets: 7, reps: "20" }, rir: 1, restSec: 10, incrementStep: 5 }),
   ],
 };
 
@@ -80,7 +77,7 @@ const DAY3_CHEST_BACK_ARMS_C = {
   title: "ГРУДЬ+СПИНА+РУКИ",
   exercises: [
     ex("Жим штанги лежа", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 0, restSec: 180, incrementStep: 2.5, note: "В последнем подходе — отказ" }),
-    ex("Подтягивания параллельным хватом", { warmup: { sets: 1, reps: "разминочный в блоке" }, work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 160, incrementStep: 2.5, note: "Хотя бы +2.5 кг. Если не можешь — тяга блока" }),
+    ex("Вертикальная тяга блока параллельным хватом", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 160, incrementStep: 2.5, note: "Параллельный (нейтральный) хват. Тяни локтями вниз, грудь вперёд" }),
     ex("Сведение стоя в кроссовере", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 160, incrementStep: 1.25, note: "Прожимка в конечной точке движения" }),
     ex("Тяга гантелей с упором в скамью", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 140, incrementStep: 2, note: "Поочередно, фиксируешь в верхней точке" }),
     ex("Разгибания на трицепс в блоке стоя c прямой рукоятью", { work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 90, incrementStep: 1.25, note: "Четкое выполнение. Без лишних движений" }),
@@ -92,13 +89,12 @@ const DAY5_LEGS_SHOULDERS_C = {
   key: "legs-shoulders-c",
   title: "НОГИ+ПЛЕЧИ",
   exercises: [
-    ex("Приседания в Смите с узкой постановкой ног", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "15" }, rir: 2, restSec: 180, incrementStep: 5, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
+    ex("Жим ногами с узкой постановкой ног", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "15" }, rir: 2, restSec: 180, incrementStep: 10, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
     ex("Жим гантелей сидя", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 2, restSec: 120, incrementStep: 2, note: "Чёткая техника выполнения. Без отказов. Тяжёлые веса" }),
     ex("Тяга штанги к подбородку", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 3, restSec: 120, incrementStep: 2.5, note: "Широкий хват. Доводи локти до параллели. Идеальная техника!" }),
     ex("Разведение гантелей в наклоне (задняя дельта)", { work: { sets: 3, reps: "10-12" }, rir: 1, restSec: 120, incrementStep: 1, note: "Ограниченная амплитуда на заднюю дельту" }),
     ex("Отведение рук в кроссовере (средняя дельта)", { work: { sets: 2, reps: "12" }, rir: 0, restSec: 90, incrementStep: 1, note: "Поочередно, фиксируешь в верхней точке" }),
     ex("Тяга каната в блоке на заднюю дельту", { work: { sets: 2, reps: "12", dropsetOn: [2] }, rir: 2, restSec: 60, note: "Локти повыше, чтобы работала дельта. Во 2-м подходе — дропсет" }),
-    ex("Скручивания", { work: { sets: 4, reps: "15" }, rir: 2, restSec: 60 }),
   ],
 };
 
