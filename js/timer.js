@@ -4,6 +4,8 @@
 // Останавливается только повторным тапом по активной кнопке.
 // Считаем по метке времени окончания (endAt), а не декрементом — так отсчёт не
 // "уплывает", даже если браузер притормозил интервал (например, при блокировке экрана).
+// По достижении нуля таймер НЕ останавливается сам — уходит в овертайм (счёт "+мм:сс"),
+// чтобы было видно, сколько отдохнул сверх плана. Останавливается только тапом.
 
 let sharedAudioCtx = null;
 function getAudioCtx() {
@@ -42,11 +44,14 @@ function formatTime(totalSec) {
 
 const REST_TIMER_STORAGE_KEY = "gym-tracker-rest-timer";
 
+const OVERTIME_STALE_SEC = 3 * 60 * 60; // старше 3ч в овертайме при восстановлении — считаем мусором, чистим
+
 const GlobalRestTimer = (function () {
   let exerciseId = null; // за какое упражнение сейчас идёт отдых
   let restSec = 0; // целевая длительность (для отображения в состоянии покоя)
   let endAt = 0; // Date.now() + restSec*1000 на момент старта
   let intervalId = null;
+  let beeped = false; // бип/вибро при пересечении нуля — только один раз за подход
 
   // Состояние дублируем в localStorage — переживает перезагрузку JS-контекста
   // (на iOS в standalone-режиме переход между "вкладками" иногда всё же
@@ -69,14 +74,16 @@ const GlobalRestTimer = (function () {
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (!saved || !saved.exerciseId || !saved.endAt) return;
-      if (saved.endAt <= Date.now()) {
-        // Уже должен был закончиться, пока нас не было — просто чистим, без бипа задним числом.
+      const overtimeSec = Math.round((Date.now() - saved.endAt) / 1000);
+      if (overtimeSec > OVERTIME_STALE_SEC) {
+        // Забытое состояние (например, после долгого перерыва) — не тащим за собой, чистим.
         localStorage.removeItem(REST_TIMER_STORAGE_KEY);
         return;
       }
       exerciseId = saved.exerciseId;
       restSec = saved.restSec;
       endAt = saved.endAt;
+      beeped = overtimeSec >= 0; // уже прошли ноль раньше — бип не повторяем
       intervalId = setInterval(tick, 1000);
     } catch (e) {
       /* битые данные в сторадже — игнорируем */
@@ -91,31 +98,31 @@ const GlobalRestTimer = (function () {
     const el = btn || findButton(forExerciseId);
     if (!el) return;
     if (intervalId && exerciseId === forExerciseId) {
-      const remaining = Math.max(0, Math.round((endAt - Date.now()) / 1000));
-      el.textContent = "⏱ " + formatTime(remaining) + " (тап — стоп)";
-      el.classList.add("timer-running");
+      const remaining = Math.round((endAt - Date.now()) / 1000);
+      if (remaining >= 0) {
+        el.textContent = "⏱ " + formatTime(remaining) + " (тап — стоп)";
+        el.classList.add("timer-running");
+        el.classList.remove("timer-overtime");
+      } else {
+        el.textContent = "⏱ +" + formatTime(-remaining) + " сверх (тап — стоп)";
+        el.classList.add("timer-running", "timer-overtime");
+      }
     } else {
       const shown = el.dataset.restSec ? parseInt(el.dataset.restSec, 10) : restSec;
       el.textContent = "⏱ Отдых " + formatTime(shown);
-      el.classList.remove("timer-running");
+      el.classList.remove("timer-running", "timer-overtime");
     }
   }
 
   function tick() {
     const remaining = Math.round((endAt - Date.now()) / 1000);
-    if (remaining <= 0) {
-      finish();
-    } else {
-      paint(exerciseId);
+    if (remaining <= 0 && !beeped) {
+      beeped = true;
+      persist();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      beep();
     }
-  }
-
-  function finish() {
-    stopInterval();
-    paint(exerciseId);
-    persist();
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    beep();
+    paint(exerciseId); // не останавливаем интервал — считаем дальше в овертайм, пока не тапнут
   }
 
   function stopInterval() {
@@ -131,6 +138,7 @@ const GlobalRestTimer = (function () {
     exerciseId = id;
     restSec = sec;
     endAt = Date.now() + sec * 1000;
+    beeped = false;
     intervalId = setInterval(tick, 1000);
     persist();
     paint(id);
