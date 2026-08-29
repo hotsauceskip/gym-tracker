@@ -103,6 +103,10 @@ h2 {
   border-color: var(--accent-2);
   font-size: 0.92rem;
 }
+.rest-timer-btn.timer-overtime {
+  background: #c0392b;
+  border-color: #c0392b;
+}
 
 .sets-table { display: flex; flex-direction: column; gap: 6px; }
 .set-row {
