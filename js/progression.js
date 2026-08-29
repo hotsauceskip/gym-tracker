@@ -15,8 +15,12 @@ function roundToStep(value, step) {
 // exerciseDef — объект упражнения из program-data.js
 // lastInstance — { sets: [{isWarmup, weight, reps, rir}], ... } | null
 // incrementStep — шаг веса при прогрессии (кг)
-function suggestNext(exerciseDef, lastInstance, incrementStep) {
+function suggestNext(exerciseDef, lastInstance, defaultIncrementStep) {
   if (!lastInstance) return null;
+  if (exerciseDef.deload) {
+    // Лёгкая неделя — веса намеренно снижены для пампа, прогрессию тут не считаем.
+    return null;
+  }
   if (exerciseDef.work.pyramid || exerciseDef.work.dropsetOn) {
     // Пирамиды/дропсеты — без авторасчёта, просто показываем прошлый факт.
     return null;
@@ -40,7 +44,7 @@ function suggestNext(exerciseDef, lastInstance, incrementStep) {
       text: `Прошлый раз: ${weight} кг × ${reps}${ref.rir != null ? ", ПДО " + ref.rir : ""}. Цель сегодня: тот же вес, +1 повтор.`,
     };
   }
-  const step = incrementStep || 1.25;
+  const step = exerciseDef.incrementStep || defaultIncrementStep || 1.25;
   const nextWeight = roundToStep(weight + step, 0.25);
   return {
     weight: nextWeight,
