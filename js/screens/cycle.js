@@ -26,20 +26,29 @@ const CycleScreen = {
 
     const list = document.createElement("div");
     list.className = "cycle-day-list";
-    seq.forEach((p, i) => {
-      const w = PROGRAM.weeks[p.weekIndex];
-      const d = w.days[p.dayIndex];
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "cycle-day-item" + (i === pointer.seq % seq.length ? " current" : "");
-      row.textContent = `${i + 1}. ${w.label} — ${d.title}`;
-      row.addEventListener("click", async () => {
-        if (!confirm(`Установить указатель на «${w.label} — ${d.title}»?`)) return;
-        await DB.setCyclePointer({ seq: i, cycleNumber: pointer.cycleNumber });
-        location.hash = "#today";
-        renderRoute();
+    const currentFlatIndex = pointer.seq % seq.length;
+    let flatIndex = 0;
+    PROGRAM.weeks.forEach((w) => {
+      const weekHeading = document.createElement("h3");
+      weekHeading.className = "cycle-week-heading";
+      weekHeading.textContent = w.label;
+      list.appendChild(weekHeading);
+
+      w.days.forEach((d, dayInWeekIdx) => {
+        const i = flatIndex; // фиксируем текущий индекс для замыкания клика
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "cycle-day-item" + (i === currentFlatIndex ? " current" : "");
+        row.textContent = `${dayInWeekIdx + 1}. ${d.title}`;
+        row.addEventListener("click", async () => {
+          if (!confirm(`Установить указатель на «${w.label} — ${d.title}»?`)) return;
+          await DB.setCyclePointer({ seq: i, cycleNumber: pointer.cycleNumber });
+          location.hash = "#today";
+          renderRoute();
+        });
+        list.appendChild(row);
+        flatIndex++;
       });
-      list.appendChild(row);
     });
     wrap.appendChild(list);
 
