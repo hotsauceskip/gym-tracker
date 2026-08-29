@@ -40,11 +40,48 @@ function formatTime(totalSec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+const REST_TIMER_STORAGE_KEY = "gym-tracker-rest-timer";
+
 const GlobalRestTimer = (function () {
   let exerciseId = null; // за какое упражнение сейчас идёт отдых
   let restSec = 0; // целевая длительность (для отображения в состоянии покоя)
   let endAt = 0; // Date.now() + restSec*1000 на момент старта
   let intervalId = null;
+
+  // Состояние дублируем в localStorage — переживает перезагрузку JS-контекста
+  // (на iOS в standalone-режиме переход между "вкладками" иногда всё же
+  // перезапускает страницу, даже если это чисто hash-роутинг в рамках SPA).
+  function persist() {
+    try {
+      if (exerciseId && intervalId) {
+        localStorage.setItem(REST_TIMER_STORAGE_KEY, JSON.stringify({ exerciseId, restSec, endAt }));
+      } else {
+        localStorage.removeItem(REST_TIMER_STORAGE_KEY);
+      }
+    } catch (e) {
+      /* localStorage недоступен — не критично, просто нет персистентности */
+    }
+  }
+
+  function restore() {
+    try {
+      const raw = localStorage.getItem(REST_TIMER_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!saved || !saved.exerciseId || !saved.endAt) return;
+      if (saved.endAt <= Date.now()) {
+        // Уже должен был закончиться, пока нас не было — просто чистим, без бипа задним числом.
+        localStorage.removeItem(REST_TIMER_STORAGE_KEY);
+        return;
+      }
+      exerciseId = saved.exerciseId;
+      restSec = saved.restSec;
+      endAt = saved.endAt;
+      intervalId = setInterval(tick, 1000);
+    } catch (e) {
+      /* битые данные в сторадже — игнорируем */
+    }
+  }
 
   function findButton(forExerciseId) {
     return document.querySelector(`[data-timer-for="${forExerciseId}"]`);
@@ -76,6 +113,7 @@ const GlobalRestTimer = (function () {
   function finish() {
     stopInterval();
     paint(exerciseId);
+    persist();
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     beep();
   }
@@ -94,6 +132,7 @@ const GlobalRestTimer = (function () {
     restSec = sec;
     endAt = Date.now() + sec * 1000;
     intervalId = setInterval(tick, 1000);
+    persist();
     paint(id);
     if (prevId && prevId !== id) paint(prevId); // сбросить визуал прошлой кнопки, если она на экране
   }
@@ -101,6 +140,7 @@ const GlobalRestTimer = (function () {
   function cancel() {
     const id = exerciseId;
     stopInterval();
+    persist();
     paint(id);
   }
 
@@ -122,6 +162,8 @@ const GlobalRestTimer = (function () {
     btn.dataset.restSec = String(forRestSec);
     paint(forExerciseId, btn);
   }
+
+  restore(); // если таймер уже шёл на момент загрузки скрипта — подхватываем его как есть
 
   return { toggle, syncButton };
 })();
