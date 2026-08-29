@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Тренировки</title>
+  <meta name="theme-color" content="#111318" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Тренировки" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app"></main>
+
+  <nav class="bottom-nav">
+    <a href="#today" class="navbtn" data-route="today">
+      <span class="navicon">🏋️</span><span>Сегодня</span>
+    </a>
+    <a href="#history" class="navbtn" data-route="history">
+      <span class="navicon">📈</span><span>История</span>
+    </a>
+    <a href="#cycle" class="navbtn" data-route="cycle">
+      <span class="navicon">🔁</span><span>Цикл</span>
+    </a>
+    <a href="#settings" class="navbtn" data-route="settings">
+      <span class="navicon">⚙️</span><span>Настройки</span>
+    </a>
+  </nav>
+
+  <script src="js/db.js"></script>
+  <script src="js/program-data.js"></script>
+  <script src="js/progression.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/screens/today.js"></script>
+  <script src="js/screens/history.js"></script>
+  <script src="js/screens/cycle.js"></script>
+  <script src="js/screens/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
