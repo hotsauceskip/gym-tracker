@@ -1,5 +1,9 @@
-// Таймер отдыха между подходами. Тап — старт/стоп (тумблер).
-// Один звук-сигнал по завершении (Web Audio, генерируется на лету — без файлов).
+// Таймер отдыха — ЕДИНЫЙ на всё приложение (не привязан к конкретной кнопке/рендеру).
+// Переход между вкладками (Сегодня/История/Цикл/Настройки) НЕ останавливает отсчёт —
+// это один и тот же JS-документ (SPA), просто меняется, что нарисовано на экране.
+// Останавливается только повторным тапом по активной кнопке.
+// Считаем по метке времени окончания (endAt), а не декрементом — так отсчёт не
+// "уплывает", даже если браузер притормозил интервал (например, при блокировке экрана).
 
 let sharedAudioCtx = null;
 function getAudioCtx() {
@@ -36,75 +40,88 @@ function formatTime(totalSec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-// Реестр всех живых таймеров — чтобы гарантированно глушить их при уходе с экрана
-// (иначе setInterval прежнего рендера продолжает тикать в фоне бесконечно).
-const activeTimers = [];
+const GlobalRestTimer = (function () {
+  let exerciseId = null; // за какое упражнение сейчас идёт отдых
+  let restSec = 0; // целевая длительность (для отображения в состоянии покоя)
+  let endAt = 0; // Date.now() + restSec*1000 на момент старта
+  let intervalId = null;
 
-class RestTimer {
-  constructor(buttonEl, restSec) {
-    this.buttonEl = buttonEl;
-    this.restSec = restSec;
-    this.remaining = restSec;
-    this.interval = null;
-    this._render();
-    this.buttonEl.addEventListener("click", () => this._onClick());
-    activeTimers.push(this);
+  function findButton(forExerciseId) {
+    return document.querySelector(`[data-timer-for="${forExerciseId}"]`);
   }
-  _onClick() {
-    const ctx = getAudioCtx();
-    if (ctx && ctx.state === "suspended") ctx.resume();
-    if (this.interval) {
-      this.cancel(); // тап во время отсчёта — остановить
+
+  function paint(forExerciseId, btn) {
+    const el = btn || findButton(forExerciseId);
+    if (!el) return;
+    if (intervalId && exerciseId === forExerciseId) {
+      const remaining = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+      el.textContent = "⏱ " + formatTime(remaining) + " (тап — стоп)";
+      el.classList.add("timer-running");
     } else {
-      this.start(); // тап в состоянии покоя — запустить
+      const shown = el.dataset.restSec ? parseInt(el.dataset.restSec, 10) : restSec;
+      el.textContent = "⏱ Отдых " + formatTime(shown);
+      el.classList.remove("timer-running");
     }
   }
-  start() {
-    this._stopInterval();
-    this.remaining = this.restSec;
-    this._render();
-    this.interval = setInterval(() => {
-      this.remaining -= 1;
-      if (this.remaining <= 0) {
-        this._finish();
-      } else {
-        this._render();
-      }
-    }, 1000);
+
+  function tick() {
+    const remaining = Math.round((endAt - Date.now()) / 1000);
+    if (remaining <= 0) {
+      finish();
+    } else {
+      paint(exerciseId);
+    }
   }
-  cancel() {
-    this._stopInterval();
-    this.remaining = this.restSec;
-    this._render();
-  }
-  _finish() {
-    this._stopInterval();
-    this.remaining = 0;
-    this._render();
+
+  function finish() {
+    stopInterval();
+    paint(exerciseId);
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     beep();
   }
-  _stopInterval() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = null;
-    }
-  }
-  _render() {
-    if (this.interval) {
-      this.buttonEl.textContent = "⏱ " + formatTime(this.remaining) + " (тап — стоп)";
-      this.buttonEl.classList.add("timer-running");
-    } else {
-      this.buttonEl.textContent = "⏱ Отдых " + formatTime(this.restSec);
-      this.buttonEl.classList.remove("timer-running");
-    }
-  }
-}
 
-// Останавливает и забывает все таймеры, созданные на предыдущем экране.
-RestTimer.stopAll = function () {
-  while (activeTimers.length) {
-    const t = activeTimers.pop();
-    t._stopInterval();
+  function stopInterval() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
   }
-};
+
+  function start(id, sec) {
+    const prevId = exerciseId;
+    stopInterval();
+    exerciseId = id;
+    restSec = sec;
+    endAt = Date.now() + sec * 1000;
+    intervalId = setInterval(tick, 1000);
+    paint(id);
+    if (prevId && prevId !== id) paint(prevId); // сбросить визуал прошлой кнопки, если она на экране
+  }
+
+  function cancel() {
+    const id = exerciseId;
+    stopInterval();
+    paint(id);
+  }
+
+  // Тап по кнопке: если это активный таймер — стоп, иначе — запустить новый
+  // (запуск нового автоматически останавливает предыдущий, если он был на другом упражнении).
+  function toggle(forExerciseId, forRestSec) {
+    const ctx = getAudioCtx();
+    if (ctx && ctx.state === "suspended") ctx.resume();
+    if (intervalId && exerciseId === forExerciseId) {
+      cancel();
+    } else {
+      start(forExerciseId, forRestSec);
+    }
+  }
+
+  // Вызывается при создании/показе кнопки — сразу нарисовать правильное состояние.
+  function syncButton(btn, forExerciseId, forRestSec) {
+    btn.dataset.timerFor = forExerciseId;
+    btn.dataset.restSec = String(forRestSec);
+    paint(forExerciseId, btn);
+  }
+
+  return { toggle, syncButton };
+})();
