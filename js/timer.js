@@ -1,4 +1,4 @@
-// Таймер отдыха между подходами. Тап — старт, тап во время отсчёта — рестарт.
+// Таймер отдыха между подходами. Тап — старт/стоп (тумблер).
 // Один звук-сигнал по завершении (Web Audio, генерируется на лету — без файлов).
 
 let sharedAudioCtx = null;
@@ -36,6 +36,10 @@ function formatTime(totalSec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+// Реестр всех живых таймеров — чтобы гарантированно глушить их при уходе с экрана
+// (иначе setInterval прежнего рендера продолжает тикать в фоне бесконечно).
+const activeTimers = [];
+
 class RestTimer {
   constructor(buttonEl, restSec) {
     this.buttonEl = buttonEl;
@@ -44,12 +48,16 @@ class RestTimer {
     this.interval = null;
     this._render();
     this.buttonEl.addEventListener("click", () => this._onClick());
+    activeTimers.push(this);
   }
   _onClick() {
-    // На iOS AudioContext оживает только внутри жеста пользователя — трогаем его здесь.
     const ctx = getAudioCtx();
     if (ctx && ctx.state === "suspended") ctx.resume();
-    this.start();
+    if (this.interval) {
+      this.cancel(); // тап во время отсчёта — остановить
+    } else {
+      this.start(); // тап в состоянии покоя — запустить
+    }
   }
   start() {
     this._stopInterval();
@@ -63,6 +71,11 @@ class RestTimer {
         this._render();
       }
     }, 1000);
+  }
+  cancel() {
+    this._stopInterval();
+    this.remaining = this.restSec;
+    this._render();
   }
   _finish() {
     this._stopInterval();
@@ -79,7 +92,7 @@ class RestTimer {
   }
   _render() {
     if (this.interval) {
-      this.buttonEl.textContent = "⏱ " + formatTime(this.remaining);
+      this.buttonEl.textContent = "⏱ " + formatTime(this.remaining) + " (тап — стоп)";
       this.buttonEl.classList.add("timer-running");
     } else {
       this.buttonEl.textContent = "⏱ Отдых " + formatTime(this.restSec);
@@ -87,3 +100,11 @@ class RestTimer {
     }
   }
 }
+
+// Останавливает и забывает все таймеры, созданные на предыдущем экране.
+RestTimer.stopAll = function () {
+  while (activeTimers.length) {
+    const t = activeTimers.pop();
+    t._stopInterval();
+  }
+};
