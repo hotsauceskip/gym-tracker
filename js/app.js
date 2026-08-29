@@ -1,6 +1,7 @@
 // Роутинг и bootstrap приложения.
 
 function renderRoute() {
+  RestTimer.stopAll(); // глушим таймеры прошлого экрана — иначе тикают в фоне вечно
   const hash = window.location.hash.replace(/^#/, "") || "today";
   const [route, param] = hash.split("/");
   const app = document.getElementById("app");
