@@ -9,7 +9,7 @@ const SettingsScreen = {
     // Шаг прогрессии по весу
     const stepBlock = document.createElement("div");
     stepBlock.className = "settings-block";
-    stepBlock.innerHTML = `<label>Шаг прибавки веса при прогрессии (кг)</label>`;
+    stepBlock.innerHTML = `<label>Шаг веса по умолчанию (кг) — используется только для упражнений без своего шага. У большинства упражнений шаг уже подобран под тип нагрузки (бицепс/плечи — 1-1.25кг, жимы — 2-2.5кг, жим ногами/присед — 5-10кг).</label>`;
     const stepInput = document.createElement("input");
     stepInput.type = "number";
     stepInput.step = "0.25";
