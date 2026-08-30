@@ -17,6 +17,10 @@ function ex(name, opts) {
     incrementStep: opts.incrementStep,
     // Лёгкая неделя (памп) — веса намеренно снижены, авто-подсказку прогрессии не показываем.
     deload: opts.deload || false,
+    // Обе гантели двигаются одновременно (вес вводится ПО ОДНОЙ гантели) — тоннаж
+    // считаем ×2, иначе вторая гантель "теряется" из суммы. Для попеременных/
+    // одной-общей-гантели упражнений — false (вес уже равен реально поднятому).
+    bothHands: opts.bothHands || false,
   };
 }
 
@@ -24,12 +28,12 @@ const DAY1_CHEST_BACK_ARMS_A = {
   key: "chest-back-arms-a",
   title: "ГРУДЬ+СПИНА+РУКИ",
   exercises: [
-    ex("Жим гантелей в наклоне", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 1, restSec: 180, incrementStep: 2, note: "Концентрация на груди. Своди лопатки, отключай плечи. Полная амплитуда" }),
+    ex("Жим гантелей в наклоне", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 1, restSec: 180, incrementStep: 2, bothHands: true, note: "Концентрация на груди. Своди лопатки, отключай плечи. Полная амплитуда" }),
     ex("Вертикальная тяга блока широким хватом", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Концентрация на спине. Без читинга, медленное выполнение" }),
     ex("Жим штанги лежа", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 160, incrementStep: 2.5, note: "Концентрация на груди. Своди лопатки, отключай плечи. Полная амплитуда" }),
     ex("Тяга гантелей в наклоне", { work: { sets: 3, reps: "10" }, rir: 2, restSec: 140, incrementStep: 2, note: "Поочередно, фиксируешь в верхней точке. Отключай бицепс при тяге" }),
     ex("Разгибания на трицепс в блоке стоя c прямой рукоятью", { work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 90, incrementStep: 1.25, note: "Четкое выполнение. Без лишних движений" }),
-    ex("Подъем гантелей на бицепс сидя на наклонной скамье", { work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 90, incrementStep: 1.25, note: "Без читинга. Полная амплитуда" }),
+    ex("Подъем гантелей на бицепс сидя на наклонной скамье", { work: { sets: 3, reps: "8-10" }, rir: 1, restSec: 90, incrementStep: 1.25, bothHands: true, note: "Без читинга. Полная амплитуда" }),
   ],
 };
 
@@ -40,9 +44,9 @@ const DAY3_LEGS_SHOULDERS_A = {
     ex("Жим ногами", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "8" }, rir: 2, restSec: 180, incrementStep: 10, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
     ex("Сгибания лежа в тренажере на бицепс бедра", { work: { sets: 2, reps: "12" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
     ex("Разгибания сидя в тренажере", { work: { sets: 1, reps: "12" }, rir: 3, restSec: 120, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
-    ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, note: "Неполная амплитуда (только на дельту)" }),
+    ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, bothHands: true, note: "Неполная амплитуда (только на дельту)" }),
     ex("Тяга блока к подбородку", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 2, restSec: 120, incrementStep: 2.5, note: "Поднимай не выше уровня плеч. Тяни локтями, а не кистями" }),
-    ex("Махи гантелей в стороны стоя", { work: { sets: 3, reps: "12" }, rir: 0, restSec: 90, incrementStep: 1, note: "Чёткая техника. Не поднимай трапециями" }),
+    ex("Махи гантелей в стороны стоя", { work: { sets: 3, reps: "12" }, rir: 0, restSec: 90, incrementStep: 1, bothHands: true, note: "Чёткая техника. Не поднимай трапециями" }),
   ],
 };
 
@@ -66,9 +70,9 @@ const DAY1_LEGS_SHOULDERS_B = {
     ex("Жим ногами", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 2, restSec: 170, incrementStep: 10, note: "Полная амплитуда движения. Контролируй отсутствие отказов" }),
     ex("Разгибания сидя в тренажере", { work: { sets: 2, reps: "12" }, rir: 1, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
     ex("Сгибания лежа в тренажере на бицепс бедра", { work: { sets: 2, reps: "12" }, rir: 2, restSec: 150, incrementStep: 2.5, note: "Равномерное движение в обе стороны" }),
-    ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, note: "Неполная амплитуда (только на дельту)" }),
+    ex("Разведение гантелей в наклоне (задняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "12" }, rir: 1, restSec: 90, incrementStep: 1, bothHands: true, note: "Неполная амплитуда (только на дельту)" }),
     ex("Отведение рук в кроссовере (средняя дельта)", { warmup: { sets: 1, reps: "20" }, work: { sets: 3, reps: "10" }, rir: 0, restSec: 60, incrementStep: 1, note: "Чёткая техника. Концентрация на плечах" }),
-    ex("Жим гантелей сидя", { work: { sets: 3, reps: "12" }, rir: 2, restSec: 120, incrementStep: 2, note: "Полная амплитуда" }),
+    ex("Жим гантелей сидя", { work: { sets: 3, reps: "12" }, rir: 2, restSec: 120, incrementStep: 2, bothHands: true, note: "Полная амплитуда" }),
   ],
 };
 
@@ -90,9 +94,9 @@ const DAY5_LEGS_SHOULDERS_C = {
   title: "НОГИ+ПЛЕЧИ",
   exercises: [
     ex("Жим ногами с узкой постановкой ног", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "15" }, rir: 2, restSec: 180, incrementStep: 10, note: "Хорошая амплитуда. Контролируй отсутствие отказов" }),
-    ex("Жим гантелей сидя", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 2, restSec: 120, incrementStep: 2, note: "Чёткая техника выполнения. Без отказов. Тяжёлые веса" }),
+    ex("Жим гантелей сидя", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "6-8" }, rir: 2, restSec: 120, incrementStep: 2, bothHands: true, note: "Чёткая техника выполнения. Без отказов. Тяжёлые веса" }),
     ex("Тяга штанги к подбородку", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "8-10" }, rir: 3, restSec: 120, incrementStep: 2.5, note: "Широкий хват. Доводи локти до параллели. Идеальная техника!" }),
-    ex("Разведение гантелей в наклоне (задняя дельта)", { work: { sets: 3, reps: "10-12" }, rir: 1, restSec: 120, incrementStep: 1, note: "Ограниченная амплитуда на заднюю дельту" }),
+    ex("Разведение гантелей в наклоне (задняя дельта)", { work: { sets: 3, reps: "10-12" }, rir: 1, restSec: 120, incrementStep: 1, bothHands: true, note: "Ограниченная амплитуда на заднюю дельту" }),
     ex("Отведение рук в кроссовере (средняя дельта)", { work: { sets: 2, reps: "12" }, rir: 0, restSec: 90, incrementStep: 1, note: "Поочередно, фиксируешь в верхней точке" }),
     ex("Тяга каната в блоке на заднюю дельту", { work: { sets: 2, reps: "12", dropsetOn: [2] }, rir: 2, restSec: 60, note: "Локти повыше, чтобы работала дельта. Во 2-м подходе — дропсет" }),
   ],
@@ -105,7 +109,7 @@ const LIGHT_A = {
     ex("Жим ногами", { warmup: { sets: 2, reps: "20" }, work: { sets: 3, reps: "15" }, rir: 8, restSec: 110, deload: true, note: "Максимально технично, медленно, без напряга — для пампа" }),
     ex("Вертикальная тяга блока широким хватом", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, note: "Максимально технично, медленно, без напряга" }),
     ex("Жим штанги в наклоне", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, note: "Максимально технично, медленно, без напряга" }),
-    ex("Подъем гантелей на бицепс c супинацией", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, note: "Максимально технично, медленно, без напряга" }),
+    ex("Подъем гантелей на бицепс c супинацией", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, bothHands: true, note: "Максимально технично, медленно, без напряга" }),
     ex("Разгибания на трицепс в блоке стоя c канатом", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, note: "Максимально технично, медленно, без напряга" }),
     ex("Махи гантелей в стороны стоя", { work: { sets: 3, reps: "15" }, rir: 8, restSec: 90, deload: true, note: "Максимально технично, медленно, без напряга" }),
   ],
