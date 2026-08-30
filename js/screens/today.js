@@ -96,7 +96,7 @@ const TodayScreen = {
               "Прошлый раз: " + ws.map((s) => `${s.weight}×${s.reps}`).join(", ");
           }
         }
-        const { bestWeight, bestVolume } = exercisePRs(histExcl);
+        const { bestWeight, bestVolume } = exercisePRs(histExcl, exDef);
         if (bestWeight) {
           prLine.textContent = `Рекорд: ${bestWeight.weight} кг × ${bestWeight.reps} (лучший тоннаж подхода: ${bestVolume.volume} кг)`;
         }
