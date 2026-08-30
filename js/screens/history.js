@@ -69,7 +69,7 @@ const HistoryScreen = {
       return;
     }
 
-    const { bestWeight, bestVolume } = exercisePRs(completed);
+    const { bestWeight, bestVolume } = exercisePRs(completed, exDef);
     const prBlock = document.createElement("div");
     prBlock.className = "pr-block";
     prBlock.innerHTML = `
