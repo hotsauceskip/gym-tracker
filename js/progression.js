@@ -53,22 +53,32 @@ function suggestNext(exerciseDef, lastInstance, defaultIncrementStep) {
   };
 }
 
-// Тоннаж сессии: сумма (вес × повторы) по всем рабочим подходам всех упражнений.
+// Множитель тоннажа: у "bothHands" гантельных упражнений вес вводится ПО ОДНОЙ гантели,
+// а двигаются обе одновременно — значит реально поднятый вес в 2 раза больше введённого.
+function tonnageMultiplier(exerciseId) {
+  const def = allExercisesFlat().find((e) => e.id === exerciseId);
+  return def && def.bothHands ? 2 : 1;
+}
+
+// Тоннаж сессии: сумма (вес × повторы × множитель) по всем рабочим подходам всех упражнений.
 function sessionTonnage(session) {
   let total = 0;
   for (const ex of session.exercises || []) {
+    const mult = tonnageMultiplier(ex.exerciseId);
     for (const s of ex.sets || []) {
       if (s.isWarmup) continue;
       const w = parseFloat(s.weight);
       const r = parseInt(s.reps, 10);
-      if (!isNaN(w) && !isNaN(r)) total += w * r;
+      if (!isNaN(w) && !isNaN(r)) total += w * r * mult;
     }
   }
   return Math.round(total);
 }
 
-// PR по упражнению: лучший вес и лучший вес*повторы среди всех рабочих подходов истории.
-function exercisePRs(historyRows) {
+// PR по упражнению: лучший вес (как введён — по одной гантели, если bothHands) и лучший
+// тоннаж подхода (вес*повторы*множитель) среди всех рабочих подходов истории.
+function exercisePRs(historyRows, exerciseDef) {
+  const mult = exerciseDef && exerciseDef.bothHands ? 2 : 1;
   let bestWeight = null;
   let bestVolume = null;
   for (const row of historyRows) {
@@ -78,7 +88,7 @@ function exercisePRs(historyRows) {
       const r = parseInt(s.reps, 10);
       if (isNaN(w) || isNaN(r)) continue;
       if (!bestWeight || w > bestWeight.weight) bestWeight = { weight: w, reps: r, date: row.date };
-      const vol = w * r;
+      const vol = w * r * mult;
       if (!bestVolume || vol > bestVolume.volume) bestVolume = { volume: vol, weight: w, reps: r, date: row.date };
     }
   }
