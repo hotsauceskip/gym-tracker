@@ -1,5 +1,5 @@
 // Простой offline-first сервис-воркер: кэшируем весь app shell при установке.
-const CACHE_NAME = "gym-tracker-v7";
+const CACHE_NAME = "gym-tracker-v8";
 const ASSETS = [
   "./",
   "./index.html",
