@@ -114,7 +114,10 @@ const TodayScreen = {
 
       const setsTable = document.createElement("div");
       setsTable.className = "sets-table";
+      let prevWeightInput = null;
+      let prevRepsInput = null;
       sessEx.sets.forEach((setState, setIdx) => {
+        const isLastSet = setIdx === sessEx.sets.length - 1;
         const row = document.createElement("div");
         row.className = "set-row" + (setState.isWarmup ? " warmup" : "");
 
@@ -127,7 +130,9 @@ const TodayScreen = {
 
         const targetEl = document.createElement("div");
         targetEl.className = "set-target";
-        targetEl.textContent = `${setState.targetReps} повт.` + (!setState.isWarmup ? `, ПДО ${exDef.rir}` : "");
+        // ПДО — только ориентир для последнего рабочего подхода (отказ наступает
+        // один раз на упражнение, а не на каждом подходе).
+        targetEl.textContent = `${setState.targetReps} повт.` + (isLastSet ? `, ПДО ${exDef.rir}` : "");
         row.appendChild(targetEl);
 
         const weightInput = document.createElement("input");
@@ -147,33 +152,58 @@ const TodayScreen = {
         repsInput.value = setState.reps;
         row.appendChild(repsInput);
 
-        const rirSelect = document.createElement("select");
-        rirSelect.className = "set-input rir-input";
-        const emptyOpt = document.createElement("option");
-        emptyOpt.value = "";
-        emptyOpt.textContent = "ПДО";
-        rirSelect.appendChild(emptyOpt);
-        for (let r = 0; r <= 10; r++) {
-          const opt = document.createElement("option");
-          opt.value = String(r);
-          opt.textContent = String(r);
-          rirSelect.appendChild(opt);
+        let rirSelect = null;
+        if (isLastSet) {
+          rirSelect = document.createElement("select");
+          rirSelect.className = "set-input rir-input";
+          const emptyOpt = document.createElement("option");
+          emptyOpt.value = "";
+          emptyOpt.textContent = "ПДО";
+          rirSelect.appendChild(emptyOpt);
+          for (let r = 0; r <= 10; r++) {
+            const opt = document.createElement("option");
+            opt.value = String(r);
+            opt.textContent = String(r);
+            rirSelect.appendChild(opt);
+          }
+          rirSelect.value = setState.rir;
+          row.appendChild(rirSelect);
+        } else {
+          row.appendChild(document.createElement("div"));
         }
-        rirSelect.value = setState.rir;
-        row.appendChild(rirSelect);
 
         const persist = async () => {
           setState.weight = weightInput.value;
           setState.reps = repsInput.value;
-          setState.rir = rirSelect.value;
+          setState.rir = rirSelect ? rirSelect.value : "";
           updateTonnage();
           await DB.saveSession(session);
         };
         weightInput.addEventListener("change", persist);
         repsInput.addEventListener("change", persist);
-        rirSelect.addEventListener("change", persist);
+        if (rirSelect) rirSelect.addEventListener("change", persist);
+
+        if (setIdx > 0) {
+          const dupBtn = document.createElement("button");
+          dupBtn.type = "button";
+          dupBtn.className = "dup-btn";
+          dupBtn.textContent = "⟲";
+          dupBtn.title = "Повторить вес и повторы из прошлого подхода";
+          const fromWeightInput = prevWeightInput;
+          const fromRepsInput = prevRepsInput;
+          dupBtn.addEventListener("click", () => {
+            weightInput.value = fromWeightInput.value;
+            repsInput.value = fromRepsInput.value;
+            persist();
+          });
+          row.appendChild(dupBtn);
+        } else {
+          row.appendChild(document.createElement("div"));
+        }
 
         setsTable.appendChild(row);
+        prevWeightInput = weightInput;
+        prevRepsInput = repsInput;
       });
       card.appendChild(setsTable);
       list.appendChild(card);
