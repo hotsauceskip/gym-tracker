@@ -111,7 +111,7 @@ h2 {
 .sets-table { display: flex; flex-direction: column; gap: 6px; }
 .set-row {
   display: grid;
-  grid-template-columns: 70px 1fr 60px 60px 60px;
+  grid-template-columns: 70px 1fr 60px 60px 60px 34px;
   gap: 6px;
   align-items: center;
 }
@@ -129,6 +129,17 @@ h2 {
   font-size: 1rem;
 }
 .weight-input, .reps-input { background: var(--card-2); }
+.dup-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-2);
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  line-height: 1;
+}
 
 .bodyweight-row { margin: 18px 0; }
 .bodyweight-row label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px; }
