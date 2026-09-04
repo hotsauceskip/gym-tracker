@@ -85,7 +85,12 @@ const TodayScreen = {
       // История/подсказка/PR — без ожидания блокировки рендера остального
       DB.getExerciseHistory(exDef.id).then((hist) => {
         const histExcl = hist.filter((h) => h.sessionId !== session.id);
-        const last = histExcl.length ? histExcl[histExcl.length - 1] : null;
+        // Прогрессию считаем только по истории ТОГО ЖЕ дня цикла (dayKey) — неделя 1
+        // и неделя 3 используют один и тот же объект дня (это осознанный повтор с
+        // прогрессией), а разные дни внутри одной недели с тем же упражнением, но
+        // другой целью по повторам/ПДО — это разные слоты, мешать их нельзя.
+        const sameSlot = histExcl.filter((h) => h.dayKey === day.key);
+        const last = sameSlot.length ? sameSlot[sameSlot.length - 1] : null;
         const suggestion = suggestNext(exDef, last, incrementStep);
         if (suggestion) {
           suggestionLine.textContent = "💡 " + suggestion.text;
