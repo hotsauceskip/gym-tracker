@@ -84,7 +84,7 @@ const DB = {
     const out = [];
     for (const s of all) {
       const e = s.exercises.find((x) => x.exerciseId === exerciseId);
-      if (e) out.push({ date: s.date, sessionId: s.id, ...e });
+      if (e) out.push({ date: s.date, sessionId: s.id, dayKey: s.dayKey, weekKey: s.weekKey, ...e });
     }
     return out;
   },
