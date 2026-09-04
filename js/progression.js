@@ -30,7 +30,10 @@ function suggestNext(exerciseDef, lastInstance, defaultIncrementStep) {
   );
   if (!workingSets.length) return null;
 
-  const ref = workingSets[0];
+  // Берём ПОСЛЕДНИЙ рабочий подход — именно на нём теперь фиксируется ПДО
+  // (отказ наступает один раз на упражнение, а не на каждом подходе), и он же
+  // честнее всего показывает реальный предел, даже если раньше упал вес/повторы.
+  const ref = workingSets[workingSets.length - 1];
   const range = parseRepsRange(exerciseDef.work.reps);
   if (!range) return null;
   const weight = parseFloat(ref.weight);
